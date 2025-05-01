@@ -30,6 +30,12 @@ bubble = pygame.image.load('bubble.png')
 bubble = pygame.transform.scale(bubble, ((int(bubble.get_width() * 6), int(bubble.get_height()* 6))))
 swor = pygame.image.load('swordsprite.png')
 swor = pygame.transform.scale(swor, ((int(swor.get_width() * 0.3), int(swor.get_height()* 0.3))))
+p1 = pygame.image.load('p1.png')
+p1 = pygame.transform.scale(p1, ((int(p1.get_width() * 0.8), int(p1.get_height()* 0.8))))
+p2 = pygame.image.load('p2.png')
+p2 = pygame.transform.scale(p2, ((int(p2.get_width() * 0.8), int(p2.get_height()* 0.8))))
+draw = pygame.image.load('draw.png')
+draw = pygame.transform.scale(draw, ((int(draw.get_width() * 0.8), int(draw.get_height()* 0.8))))
 bubble.set_alpha(150)
 pygame.display.set_icon(knight)
 pygame.display.set_caption("Phantom Sword")
@@ -323,117 +329,121 @@ jumping2 = False
 
 while r:
 
-    if r:
-        ecran.blit(fundal,(0,0))
-        clock.tick(FPS)
-        hel = player2.health
-        attack(player1,player2)
-        attack(player2,player1)
-        ecran.blit(knight,(10,15))
-        ecran.blit(mauler,(730,30))
-        healt_bar1.draw(player1.health)
-        energy_bar1.draw(player1.energy)
-        healt_bar2.draw(player2.health)
-        energy_bar2.draw(player2.energy)
+    ecran.blit(fundal,(0,0))
+    if player1.health <= 0 and player2.health > 0:
+        ecran.blit(p2,(250,80))
+    elif player2.health <= 0 and player1.health >0:
+        ecran.blit(p1,(250,80))
+    elif player1.health <= 0 and player2.health <= 0: 
+        ecran.blit(draw,(350,80))
+    clock.tick(FPS)
+    attack(player1,player2)
+    attack(player2,player1)
+    ecran.blit(knight,(10,15))
+    ecran.blit(mauler,(730,30))
+    healt_bar1.draw(player1.health)
+    energy_bar1.draw(player1.energy)
+    healt_bar2.draw(player2.health)
+    energy_bar2.draw(player2.energy)
 
-        player1.update_anima(moving_left1,moving_right1)
-        player1.draw()
-        player1.move(moving_left1, moving_right1)
-        player1.check_alive()
+    player1.update_anima(moving_left1,moving_right1)
+    player1.draw()
+    player1.move(moving_left1, moving_right1)
+    player1.check_alive()
 
-        player2.update_anima(moving_left2,moving_right2)
-        player2.draw()
-        player2.move(moving_left2, moving_right2)
-        player2.check_alive()
+    player2.update_anima(moving_left2,moving_right2)
+    player2.draw()
+    player2.move(moving_left2, moving_right2)
+    player2.check_alive()
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                r=False
-            if event.type == pygame.KEYDOWN:
-                if player1.alive == True:
-                    if event.key == pygame.K_f:
-                        if player1.is_attacking == 0 and player1.shield == False and player1.is_jumping == False:
-                            player1.attack = 1
-                    if event.key == pygame.K_a and player1.shield == False:
-                        moving_left1 = True
-                        if moving_right1 == True:
-                            moving_right1 = False
-                        if player1.is_attacking ==0:
-                            player1.action = 1
-                    if event.key == pygame.K_d and player1.shield == False:
-                        if player1.is_attacking == 0 :
-                            player1.action = 1
-                        moving_right1 = True
-                        if moving_left1 == True:
-                            moving_left1 = False
-                    if event.key == pygame.K_w and player1.is_jumping == False and player1.shield == False and player1.is_attacking == 0:
-                        player1.jump = True
-                    if event.key == pygame.K_e and player1.is_jumping == False and player1.action < 1 and player1.energy > 0:
-                        player1.shield = True
-                if player2.alive == True and mode == False:
-                    if event.key == pygame.K_l:
-                        if player2.is_attacking == 0 and player2.shield == False and player2.is_jumping == False:
-                            player2.action = 1
-                        moving_right2 = True
-                        moving_left2 = False
-                    if event.key == pygame.K_j and player2.shield == False:
-                        moving_left2 = True
-                        moving_right2 = False
-                        if player2.is_attacking == 0:
-                            player2.action = 1
-                    if event.key == pygame.K_i and player2.is_jumping == False and player2.shield == False and player2.is_attacking == 0:
-                        player2.jump = True
-                    if event.key == pygame.K_p and player2.shield == False:
-                        if player2.is_attacking == 0:
-                            player2.attack = 1
-                    if event.key == pygame.K_o and player2.is_jumping == False and player2.action < 1 and player2.energy >0:
-                        player2.shield = True
-        if mode == True:
-            player1.speed = 6
-            player2.damage = 15
-            if math.sqrt((player1.rect.x - player2.rect.x) * (player1.rect.x - player2.rect.x) + (player1.rect.y -player2.rect.y) * (player1.rect.y -player2.rect.y)) > 70 and player2.health > 0:
-                inrange = False
-                inrange2 = False
-                player2.shield = False
-                if player2.rect.x > player1.rect.x:
-                    if player2.is_attacking == 0:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            r=False
+        if event.type == pygame.KEYDOWN:
+            if player1.alive == True:
+                if event.key == pygame.K_f:
+                    if player1.is_attacking == 0 and player1.shield == False and player1.is_jumping == False:
+                        player1.attack = 1
+                if event.key == pygame.K_a and player1.shield == False:
+                    moving_left1 = True
+                    if moving_right1 == True:
+                        moving_right1 = False
+                    if player1.is_attacking ==0:
+                        player1.action = 1
+                if event.key == pygame.K_d and player1.shield == False:
+                    if player1.is_attacking == 0 :
+                        player1.action = 1
+                    moving_right1 = True
+                    if moving_left1 == True:
+                        moving_left1 = False
+                if event.key == pygame.K_w and player1.is_jumping == False and player1.shield == False and player1.is_attacking == 0:
+                    player1.jump = True
+                if event.key == pygame.K_e and player1.is_jumping == False and player1.action < 1 and player1.energy > 0:
+                    player1.shield = True
+            if player2.alive == True and mode == False:
+                if event.key == pygame.K_l:
+                    if player2.is_attacking == 0 and player2.shield == False and player2.is_jumping == False:
                         player2.action = 1
+                    moving_right2 = True
+                    moving_left2 = False
+                if event.key == pygame.K_j and player2.shield == False:
                     moving_left2 = True
                     moving_right2 = False
-                else:
                     if player2.is_attacking == 0:
                         player2.action = 1
-                    moving_left2 = False
-                    moving_right2 = True
-            elif player2.health > 0:
-                if inrange == False:
-                    inrange = True
-                    update_att = pygame.time.get_ticks()
-                else:
-                    moving_left2 = False
-                    moving_right2 = False 
-                    if random.randrange(1,11) == 1 and player2.health > 0 and player1.health > 0:
-                        if inrange2 == False:
-                            player2.shield = True
-                            inrange2 = True
-                            update_att = pygame.time.get_ticks()
-                        else:
-                            if update_att - pygame.time.get_ticks() > att or update_att - pygame.time.get_ticks() < (-1)*att:
-                                inrange2 = False
-                                player2.shield = False
-
-                    if update_att - pygame.time.get_ticks() > att or update_att - pygame.time.get_ticks() < (-1)*att and player2.shield == False:
+                if event.key == pygame.K_i and player2.is_jumping == False and player2.shield == False and player2.is_attacking == 0:
+                    player2.jump = True
+                if event.key == pygame.K_p and player2.shield == False:
+                    if player2.is_attacking == 0:
+                        player2.attack = 1
+                if event.key == pygame.K_o and player2.is_jumping == False and player2.action < 1 and player2.energy >0:
+                    player2.shield = True
+    if mode == True:
+        player1.speed = 6
+        player2.damage = 15
+        if math.sqrt((player1.rect.x - player2.rect.x) * (player1.rect.x - player2.rect.x) + (player1.rect.y -player2.rect.y) * (player1.rect.y -player2.rect.y)) > 70 and player2.health > 0:
+            inrange = False
+            inrange2 = False
+            player2.shield = False
+            if player2.rect.x > player1.rect.x:
+                if player2.is_attacking == 0:
+                    player2.action = 1
+                moving_left2 = True
+                moving_right2 = False
+            else:
+                if player2.is_attacking == 0:
+                    player2.action = 1
+                moving_left2 = False
+                moving_right2 = True
+        elif player2.health > 0:
+            if inrange == False:
+                inrange = True
+                update_att = pygame.time.get_ticks()
+            else:
+                moving_left2 = False
+                moving_right2 = False 
+                if random.randrange(1,11) == 1 and player2.health > 0 and player1.health > 0:
+                    if inrange2 == False:
+                        player2.shield = True
+                        inrange2 = True
                         update_att = pygame.time.get_ticks()
-                        if player2.is_attacking == 0:
-                            if player2.rect.x > player1.rect.x:
-                                player2.flip = True
-                            else:
-                                player2.flip = False
-                            if player2.shield == False:
-                                player2.attack = 1
-            if player1.health <= 0:
-                player2.action = 0
-                player2.speed = 0
+                    else:
+                        if update_att - pygame.time.get_ticks() > att or update_att - pygame.time.get_ticks() < (-1)*att:
+                            inrange2 = False
+                            player2.shield = False
+
+                if update_att - pygame.time.get_ticks() > att or update_att - pygame.time.get_ticks() < (-1)*att and player2.shield == False:
+                    update_att = pygame.time.get_ticks()
+                    if player2.is_attacking == 0:
+                        if player2.rect.x > player1.rect.x:
+                            player2.flip = True
+                        else:
+                            player2.flip = False
+                        if player2.shield == False:
+                            player2.attack = 1
+        if player1.health <= 0:
+            player2.action = 0
+            player2.speed = 0
 
 
 
