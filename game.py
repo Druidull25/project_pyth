@@ -441,7 +441,7 @@ while r:
                             player2.flip = False
                         if player2.shield == False:
                             player2.attack = 1
-        if player1.health <= 0:
+        if player1.health <= 0 and player2.health >= 0:
             player2.action = 0
             player2.speed = 0
 
