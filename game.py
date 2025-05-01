@@ -28,6 +28,8 @@ knight = pygame.transform.scale(knight, ((int(knight.get_width() * 1.2), int(kni
 mauler = pygame.transform.scale(mauler, ((int(mauler.get_width() * 0.8), int(mauler.get_height()* 0.8))))
 bubble = pygame.image.load('bubble.png')
 bubble = pygame.transform.scale(bubble, ((int(bubble.get_width() * 6), int(bubble.get_height()* 6))))
+swor = pygame.image.load('swordsprite.png')
+swor = pygame.transform.scale(swor, ((int(swor.get_width() * 0.3), int(swor.get_height()* 0.3))))
 bubble.set_alpha(150)
 pygame.display.set_icon(knight)
 pygame.display.set_caption("Phantom Sword")
@@ -279,7 +281,7 @@ while mm:
     ecran.fill((0,0,0))
     ecran.blit(phantom,(300,100))
     ecran.blit(sword,(325,150))
-    ecran.blit(knight,(100,100))
+    ecran.blit(swor,(100,100))
     if menu1 == False:
         if start.draw(menu1,r) == True:
             menu1 = True
