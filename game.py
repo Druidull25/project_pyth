@@ -1,8 +1,17 @@
 import pygame
 import math
 import random
+from pygame import mixer
 
+mixer.init()
 pygame.init()
+
+pygame.mixer.music.load('main_theme.mp3')
+pygame.mixer.music.set_volume(0.5)
+
+jump_sound = pygame.mixer.Sound('jump_improved.mp3')
+slash_sound = pygame.mixer.Sound('slash_improved.mp3')
+bubble_sound = pygame.mixer.Sound('bubble.mp3')
 
 ecran_lungime = 800
 ecran_inaltime = 600
@@ -36,7 +45,13 @@ p2 = pygame.image.load('p2.png')
 p2 = pygame.transform.scale(p2, ((int(p2.get_width() * 0.8), int(p2.get_height()* 0.8))))
 draw = pygame.image.load('draw.png')
 draw = pygame.transform.scale(draw, ((int(draw.get_width() * 0.8), int(draw.get_height()* 0.8))))
+rock = pygame.image.load('rock.jpg')
+rock = pygame.transform.scale(rock, ((int(rock.get_width() * 0.5), int(rock.get_height()* 0.5))))
+rock.set_colorkey((255,255,255))
+
+
 bubble.set_alpha(150)
+
 pygame.display.set_icon(knight)
 pygame.display.set_caption("Phantom Sword")
 
@@ -64,6 +79,35 @@ class button():
                 return True
         if pygame.mouse.get_pressed()[0] == 0:
             return False
+        
+class boulder(pygame.sprite.Sprite):
+    def __init__(self,img,x,y):
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.center = (x ,y)
+        self.gravity = 10
+    def move(self):
+        if self.rect.bottom + self.gravity > 800:
+            dy = 1000 - self.rect.bottom
+        else:
+            dy = self.gravity
+        self.rect.y += dy
+    def damage(self, fight):
+        if math.sqrt((self.rect.x - fight.rect.x) * (self.rect.x - fight.rect.x) + (self.rect.y -fight.rect.y) * (self.rect.y -fight.rect.y)) <= 70 and fight.shield == False:
+            fight.health -= 5
+            fight.is_attacked = True
+            if fight.rect.x > self.rect.x:
+                fight.hitpoint = 1
+            else:
+                fight.hitpoint = -1
+        elif math.sqrt((self.rect.x - fight.rect.x) * (self.rect.x - fight.rect.x) + (self.rect.y -fight.rect.y) * (self.rect.y -fight.rect.y)) <= 70:
+            fight.energy -= 1
+    def draw(self):
+        if self.rect.y <= 1300:
+            ecran.blit(self.image,(self.rect.x + 200,self.rect.y))
+
+
+        
 
 class fighter (pygame.sprite.Sprite):
     def __init__(self, x, y, scara, speed, imm):
@@ -264,6 +308,8 @@ def attack(self,other):
             if other.energy <= 0:
                 other.shield= False
 
+inter = 50
+
 inrange = False
 inrange2 = False
 
@@ -280,7 +326,6 @@ mode = False
 
 
 r = True
-
 
 while mm:
     clock.tick(FPS)
@@ -325,10 +370,16 @@ energy_bar2= EnergyBar(685,100,player2.energy,player2.energy)
 moving_left2 = False
 moving_right2 = False
 jumping2 = False
+danger = False
 
-
+falltime = pygame.time.get_ticks()
+pygame.mixer.music.play(-1,0.0,5000)
 while r:
 
+    if player1.energy <= 0:
+        player1.shield = False
+    if player2.energy <= 0:
+        player2.shield = False
     ecran.blit(fundal,(0,0))
     if player1.health <= 0 and player2.health > 0:
         ecran.blit(p2,(250,80))
@@ -337,6 +388,13 @@ while r:
     elif player1.health <= 0 and player2.health <= 0: 
         ecran.blit(draw,(350,80))
     clock.tick(FPS)
+    if pygame.time.get_ticks() - falltime >= 5000 :
+        x = random.randrange(50,700)
+        bould = boulder (rock ,x, 0)
+        falltime = pygame.time.get_ticks()
+        danger = True
+    
+
     attack(player1,player2)
     attack(player2,player1)
     ecran.blit(knight,(10,15))
@@ -356,6 +414,16 @@ while r:
     player2.move(moving_left2, moving_right2)
     player2.check_alive()
 
+    if danger == True:
+        if bould.rect.y >= 1000:
+            danger = False
+            falltime = pygame.time.get_ticks()
+        else:
+            bould.draw()
+            bould.move()
+            bould.damage(player1)
+            bould.damage(player2)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             r=False
@@ -364,6 +432,7 @@ while r:
                 if event.key == pygame.K_f:
                     if player1.is_attacking == 0 and player1.shield == False and player1.is_jumping == False:
                         player1.attack = 1
+                        slash_sound.play()
                 if event.key == pygame.K_a and player1.shield == False:
                     moving_left1 = True
                     if moving_right1 == True:
@@ -378,8 +447,10 @@ while r:
                         moving_left1 = False
                 if event.key == pygame.K_w and player1.is_jumping == False and player1.shield == False and player1.is_attacking == 0:
                     player1.jump = True
+                    jump_sound.play()
                 if event.key == pygame.K_e and player1.is_jumping == False and player1.action < 1 and player1.energy > 0:
                     player1.shield = True
+                    bubble_sound.play()
             if player2.alive == True and mode == False:
                 if event.key == pygame.K_l:
                     if player2.is_attacking == 0 and player2.shield == False and player2.is_jumping == False:
@@ -393,11 +464,14 @@ while r:
                         player2.action = 1
                 if event.key == pygame.K_i and player2.is_jumping == False and player2.shield == False and player2.is_attacking == 0:
                     player2.jump = True
+                    jump_sound.play()
                 if event.key == pygame.K_p and player2.shield == False:
                     if player2.is_attacking == 0:
                         player2.attack = 1
+                        slash_sound.play()
                 if event.key == pygame.K_o and player2.is_jumping == False and player2.action < 1 and player2.energy >0:
                     player2.shield = True
+                    bubble_sound.play()
     if mode == True:
         player1.speed = 6
         player2.damage = 15
@@ -425,6 +499,7 @@ while r:
                 if random.randrange(1,11) == 1 and player2.health > 0 and player1.health > 0:
                     if inrange2 == False:
                         player2.shield = True
+                        bubble_sound.play()
                         inrange2 = True
                         update_att = pygame.time.get_ticks()
                     else:
@@ -441,6 +516,7 @@ while r:
                             player2.flip = False
                         if player2.shield == False:
                             player2.attack = 1
+                            slash_sound.play()
         if player1.health <= 0 and player2.health >= 0:
             player2.action = 0
             player2.speed = 0
